@@ -1,14 +1,3 @@
-"""
-========== 7tv Emote Set to Telegram sticker pack ==========
-
-requirements:
-    - ffmpeg
-    - imagemagick
-    - telebot
-    - Pillow
-"""
-
-
 import requests
 import telebot
 import subprocess
