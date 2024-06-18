@@ -3,7 +3,7 @@
 we jot down shii fr fr
 
 
---------------------
+<br>
 --------------------
 
 ## ` 🔮 7tv Channel Emote Set To Telegram Sticker Pack 🔮 `
@@ -14,10 +14,10 @@ we jot down shii fr fr
 - imagemagick
 - telebot (pip library)
 ```
-
 [Link](https://github.com/Saikyo0/Scribbles/blob/main/SteamSaleForecast.py)
 
---------------------
+
+<br>
 --------------------
 
 ## ` 🖥️ Windows Program Status to Telegram User Bio 🖥️ `
@@ -27,8 +27,5 @@ we jot down shii fr fr
 ```
 - WTelegram
 ```
-
 [Link](https://github.com/Saikyo0/Scribbles/blob/main/StatusToTelegramBio.CS)
 
---------------------
---------------------
