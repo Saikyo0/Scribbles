@@ -1,10 +1,9 @@
 # Scribbles
-
-we jot down shii fr fr
+all old scribble files, 0 relation
 
 
 <br>
---------------------
+
 
 ## ` 🔮 7tv Channel Emote Set To Telegram Sticker Pack 🔮 `
 #### Languaga: Python
@@ -18,7 +17,7 @@ we jot down shii fr fr
 
 
 <br>
---------------------
+
 
 ## ` 🖥️ Windows Program Status to Telegram User Bio 🖥️ `
 #### Languaga: C#
