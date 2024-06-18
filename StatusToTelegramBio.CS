@@ -11,6 +11,8 @@ using WTelegram;
 
 [DllImport("user32.dll")]
 static extern IntPtr GetForegroundWindow();
+
+[DllImport("user32.dll")]
 static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 
 static Process GetFocusedApplicationTitle()
@@ -74,8 +76,8 @@ static async Task Main()
         }
 
         var client = new Client(Config);
-
         await client.Login("+<phone_number>");
+
         Console.WriteLine($"We are logged-in {client.User.first_name}.");
 
         Process focusedApplication = GetFocusedApplicationTitle();
@@ -89,6 +91,7 @@ static async Task Main()
             {
                 if (focusedApplication.MainWindowTitle != oldApplication.MainWindowTitle & getAppTitle(focusedApplication) != "")
                 {
+                    Console.WriteLine($"New Focused App");
                     oldApplication = focusedApplication;
                     try
                     {
@@ -102,7 +105,7 @@ static async Task Main()
                     }
                 }
             }
-            await Task.Delay(10000); // Use Task.Delay for cleaner async/await pattern
+            await Task.Delay(5000); // Use Task.Delay for cleaner async/await pattern
         }
     }
     catch (Exception ex) // Catch general exceptions at the top level
