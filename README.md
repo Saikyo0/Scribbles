@@ -3,9 +3,11 @@
 we jot down shii fr fr
 
 
-<br></br>
+--------------------
+--------------------
 
-## ` ✨ 7tv Channel Emote Set To Telegram Sticker Pack  ✨ `
+## ` 🔮 7tv Channel Emote Set To Telegram Sticker Pack 🔮 `
+#### Languaga: Python
 #### Requirements
 ```
 - ffmpeg
@@ -13,7 +15,20 @@ we jot down shii fr fr
 - telebot (pip library)
 ```
 
-https://github.com/Saikyo0/Scribbles/blob/a5888ba4e746742d7eaaa732e808e27694d5b6c0/7tvToTg.py#L1-L179
+[Link](https://github.com/Saikyo0/Scribbles/blob/main/SteamSaleForecast.py)
+
+--------------------
+--------------------
+
+## ` 🖥️ Windows Program Status to Telegram User Bio 🖥️ `
+#### Languaga: C#
+
+#### Requirements
+```
+- WTelegram
+```
+
+[Link](https://github.com/Saikyo0/Scribbles/blob/main/StatusToTelegramBio.CS)
 
 --------------------
 --------------------
