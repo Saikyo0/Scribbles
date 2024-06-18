@@ -1,6 +1,3 @@
-// Only Windows
-// install WTelegram from nutget
-
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -49,11 +46,9 @@ static async Task Main()
             {
                 case Process d when d.ProcessName.Contains("Visual Studio", StringComparison.OrdinalIgnoreCase): return "Playing in VS...";
                 case Process d when d.ProcessName.Contains("Youtube", StringComparison.OrdinalIgnoreCase): return "Watching YouTube...";
-                case Process d when d.ProcessName.Contains("", StringComparison.OrdinalIgnoreCase): return "Offline...";
 
                 case Process d when d.MainWindowTitle.Contains("Visual Studio", StringComparison.OrdinalIgnoreCase): return "Playing in VS...";
                 case Process d when d.MainWindowTitle.Contains("Youtube", StringComparison.OrdinalIgnoreCase): return "Watching YouTube...";
-                case Process d when d.MainWindowTitle.Contains("", StringComparison.OrdinalIgnoreCase): return "Offline...";
 
             }
             return "";
@@ -63,20 +58,20 @@ static async Task Main()
         {
             switch (what)
             {
-                //replace values
-                case "api_id": return "<app_id>";
-                case "api_hash": return "<app_hash>";
+                case "api_id": return "<api_id>";
+                case "api_hash": return "<api_hash>";
                 case "phone_number": return "+<number>";
                 case "verification_code": return "<code>";
-                case "first_name": return "";     
-                case "last_name": return "";       
-                case "password": return "";     //2fa
-                default: return null;                  
+                case "first_name": return "";      // if sign-up is required
+                case "last_name": return "";        // if sign-up is required
+                case "password": return "";     // if user has enabled 2FA
+                default: return null;                  // let WTelegramClient decide the default config
             }
         }
 
-        var client = new Client(Config);
-        await client.Login("+<phone_number>");
+        var client = new Client(Config); 
+        await client.Login("+<number>");
+        client.DisableUpdates();
 
         Console.WriteLine($"We are logged-in {client.User.first_name}.");
 
@@ -89,15 +84,18 @@ static async Task Main()
 
             if (focusedApplication != null)
             {
-                if (focusedApplication.MainWindowTitle != oldApplication.MainWindowTitle & getAppTitle(focusedApplication) != "")
+                string oldBio = "";
+                string newBio = getAppTitle(focusedApplication);
+
+                if (newBio == "") { newBio = oldBio; }
+                else if (focusedApplication.MainWindowTitle != oldApplication.MainWindowTitle)
                 {
-                    Console.WriteLine($"New Focused App");
                     oldApplication = focusedApplication;
+                    oldBio = newBio;
                     try
                     {
-                        Console.WriteLine(focusedApplication.ProcessName);
                         Console.WriteLine(focusedApplication.MainWindowTitle);
-                        await client.Account_UpdateProfile(client.User.first_name, client.User.last_name, getAppTitle(focusedApplication));
+                        await client.Account_UpdateProfile(client.User.first_name, client.User.last_name, newBio);
                     }
                     catch (Exception ex)
                     {
