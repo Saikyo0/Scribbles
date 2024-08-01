@@ -28,3 +28,13 @@ all old scribble files, 0 relation
 ```
 [Link](https://github.com/Saikyo0/Scribbles/blob/main/StatusToTelegramBio.CS)
 
+
+
+## ` Steam sale forecast `
+#### Languaga: Python
+
+#### Requirements
+```
+- BeautifulSoup
+```
+[Link](https://github.com/Saikyo0/Scribbles/blob/main/SteamSaleForecast.py)
