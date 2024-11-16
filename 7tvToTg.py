@@ -1,3 +1,12 @@
+"""
+What You Need:
+    #API Token: Get your Bearer token from inspecting https://7tv.app/emotes, going to networks and check the headers of a gql request 
+    #Telegram Bot Token: Create a bot on Telegram and copy the token.
+    #User ID: Get your telegram User ID from (for owning the pack).
+    #Channel ID/ EmoteSet ID: Either the Twitch channel you want to copy or the Emote set ID from 7tv.app
+    #ImageMagick
+"""
+
 import requests
 import telebot
 import subprocess
@@ -34,7 +43,7 @@ def convert_webp_to_webm(input_path, output_path, height):
 
     os.mkdir("frames")
 
-    command = ['magick', input_path, '-gravity', 'center', '-background', 'transparent', '-extent', f'512x{format(height)}', "frames/img.png"]
+    command = ['magick', input_path, '-gravity', 'center', '-background', 'transparent', '-extent', f'512x{format(height)}', "frames/img-%0d.png"]
     subprocess.run(command)
     
     command = [
@@ -66,21 +75,29 @@ def getUser(username, token):
         print("Request failed with status code:", response.status_code)
     return None
 
-def getEmotes(userID):
-    if userID:
-        emoteurls = []
-        url = f"https://7tv.io/v3/emote-sets/{userID}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.json()
-            for emote in data["emotes"]:
-                emoteurls.append(f'https://cdn.7tv.app/emote/{emote["id"]}/2x.webp')
-        print(response)
-        return emoteurls
+def getEmotes(userID: int|str = None, setID: int|str = None):
+    """
+     :param userID: 7tv channel id
+     :type name: :obj:`str` or :obj:`int`
 
-def makePack(channelID: int|str, tg_Token: str, tg_user_id: int, 
-             pack_title:str, pack_name:str, pack_type:str, 
-             target_height:int|float) -> str|bool:
+     :param setID: 7tv emote set id
+     :type name: :obj:`str` or :obj:`int`
+    """
+    emoteurls = []
+    url = f"https://7tv.io/v3/emote-sets/{userID}"
+    if setID: url = f"https://7tv.io/v3/emote-sets/{setID}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        for emote in data["emotes"]:
+            emoteurls.append(f'https://cdn.7tv.app/emote/{emote["id"]}/2x.webp')
+    print(response)
+    return emoteurls
+
+def makePack(tg_Token: str, tg_user_id: int, 
+             pack_title:str, pack_name:str, animated:bool, 
+             target_height:int|float, channelID: int|str = None,
+             emotesetID: int|str = None) -> str|bool:
     """
      :param channelID: channels username, the channel to get emotes of
      :type name: :obj:`str` or :obj:`int`
@@ -94,10 +111,10 @@ def makePack(channelID: int|str, tg_Token: str, tg_user_id: int,
      :param pack_title: your telegram bot's token
      :type name: :obj:`str`
 
-     :param pack_name: your sticker pack name
+     :param pack_name: your sticker pack name, no spaces and no special characters other than underscore
      :type name: :obj:`str`
 
-     :param pack_type: your sticker pack type, animated or static, each type can hold varying quantity of stickers 
+     :param animated: animated true or static false, each type can hold varying quantity of stickers 
         with static being the most
      :type name: :obj:`str`
 
@@ -106,13 +123,14 @@ def makePack(channelID: int|str, tg_Token: str, tg_user_id: int,
     """
     
     bot = telebot.TeleBot(tg_Token)
-    emoteurls = getEmotes(channelID)
+    emoteurls = []
+    if channelID: emoteurls = getEmotes(channelID)
+    else: emoteurls = emoteurls = getEmotes(emotesetID)
     result = False
 
     pack_name += "_by_" + bot.user.username
-    print(pack_name)
 
-    if pack_type == "animated":
+    if animated:
         emote_name = emoteurls[0]
         webp_input_path = 'input.webp'
         webm_output_path = 'output.webm'
@@ -127,7 +145,7 @@ def makePack(channelID: int|str, tg_Token: str, tg_user_id: int,
             bot.add_sticker_to_set(tg_user_id, pack_name, emojis=["👍"], webm_sticker=file)
         result = True
 
-    if pack_type == "static":
+    else:
         emote_name = emoteurls[0]
         png_output_path = "output.png"
         download_webp_image_as_png(emote_name, png_output_path, target_height)
@@ -140,29 +158,37 @@ def makePack(channelID: int|str, tg_Token: str, tg_user_id: int,
             bot.add_sticker_to_set(tg_user_id, pack_name, emojis=["👍"], png_sticker=file)
         result = True
 
-    if result: return pack_name
+    if result: return "https://t.me/addstickers/" + pack_name
     else: result
 
 
-#example
-#replace all of the values under to fit your needs
-token = """Bearer <your_bearer_token>"""
+token = """Bearer <token>"""
+
+"""
+Copying a Twitch Channel:
+
 channelName = "Psp1g"
 channelID = getUser(channelName, token)
+emotesetID = None
+"""
 
-tg_Token = "<your_bot_token>"
-tg_user_id = 1026202266
-pack_title = "Psp's 7tv Emotes"
-pack_name = "Psp7TV"
-pack_type = "static"
-stickers_height = 100
+channelID = None
+emotesetId = "<emote set id>"
+tg_Token = "<bot token>"
+tg_user_id = 123456789
+pack_title = "Pack title"
+pack_name = "Pack_link_name"
+stickers_height = 200
 
-makePack(
-    channelID=channelID, 
+pack_link = makePack(
+    channelID=channelID,
+    emotesetID=emotesetId, 
     tg_Token=tg_Token, 
     tg_user_id=tg_user_id, 
     pack_title=pack_title, 
     pack_name=pack_name, 
-    pack_type=pack_type,
+    animated=True,
     target_height=stickers_height
 )
+
+if pack_link: print(pack_link)
