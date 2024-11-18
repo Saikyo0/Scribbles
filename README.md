@@ -10,8 +10,8 @@ all old scribble files, 0 relation
 #### Requirements
 ```
 - ffmpeg (either use choco[windows] or web)
-- imagemagick (either use choco[windows] or web)
 - telebot (pip library)
+- pillow (pip library)
 ```
 [Link](https://github.com/Saikyo0/Scribbles/blob/main/7tvToTg.py)
 
