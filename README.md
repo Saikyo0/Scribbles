@@ -5,7 +5,8 @@ all old scribble files, 0 relation
 <br>
 
 
-## ` 🔮 7tv Channel Emote Set To Telegram Sticker Pack 🔮 `
+## ` 🔮 7tv To Telegram 🔮 `
+### ` ! Channel/Emote Set To Sticker Pack ! `
 #### Languaga: Python
 #### Requirements
 ```
