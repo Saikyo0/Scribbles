@@ -4,15 +4,14 @@ What You Need:
     #Telegram Bot Token: Create a bot on Telegram and copy the token.
     #User ID: Get your telegram User ID from (for owning the pack).
     #Channel ID/ EmoteSet ID: Either the Twitch channel you want to copy or the Emote set ID from 7tv.app
-    #ImageMagick
 """
 
-import requests
 import telebot
-import subprocess
+import requests
 import os, shutil
-from PIL import Image
+import subprocess
 from io import BytesIO
+from PIL import Image, ImageSequence
 
 def download_webp_image(url, save_path):
     response = requests.get(url)
@@ -35,22 +34,31 @@ def download_webp_image_as_png(url, output_path, height):
     new_image.save(output_path, "PNG")
 
 def convert_webp_to_webm(input_path, output_path, height):
-    try: shutil.rmtree("frames")
-    except: pass
+    """Convert WebP to WebM (animated stickers) using Pillow"""
+    try:
+        # Ensure the frames directory is cleared
+        shutil.rmtree("frames", ignore_errors=True)
+        os.makedirs("frames", exist_ok=True)
 
-    try: os.remove(output_path)
-    except: pass
+        # Extract frames from the WebP animation
+        with Image.open(input_path) as webp_image:
+            frame_idx = 0
+            for frame in ImageSequence.Iterator(webp_image):
+                frame_resized = frame.resize((512, height), Image.Resampling.LANCZOS)
+                frame_path = f"frames/img_{frame_idx:03d}.png"
+                frame_resized.save(frame_path, "PNG")
+                frame_idx += 1
 
-    os.mkdir("frames")
-
-    command = ['magick', input_path, '-gravity', 'center', '-background', 'transparent', '-extent', f'512x{format(height)}', "frames/img-%0d.png"]
-    subprocess.run(command)
-    
-    command = [
-        'ffmpeg', '-y', '-framerate', '25', '-f', 'image2', '-i', 'frames/img-%0d.png', '-vf', f'scale=512:{height}',
-        '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-t', '2.8', output_path
-    ]
-    subprocess.run(command)
+        # Convert extracted frames to WebM using webptools
+        command = [
+            'ffmpeg', '-y', '-framerate', '25', '-f', 'image2', '-i', 'frames/img_%03d.png',
+            '-vf', f'scale=512:{height}', '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p',
+            '-t', '2.8', output_path
+        ]
+        subprocess.run(command)
+        print(f"Converted {input_path} to {output_path}.")
+    except Exception as e:
+        print("Error converting WebP to WebM:", e)
 
 def getUser(username, token):
     """
@@ -84,8 +92,7 @@ def getEmotes(userID: int|str = None, setID: int|str = None):
      :type name: :obj:`str` or :obj:`int`
     """
     emoteurls = []
-    url = f"https://7tv.io/v3/emote-sets/{userID}"
-    if setID: url = f"https://7tv.io/v3/emote-sets/{setID}"
+    url =  f"https://7tv.io/v3/emote-sets/{userID}" if userID else f"https://7tv.io/v3/emote-sets/{setID}"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
@@ -126,9 +133,8 @@ def makePack(tg_Token: str, tg_user_id: int,
     emoteurls = []
     if channelID: emoteurls = getEmotes(channelID)
     else: emoteurls = emoteurls = getEmotes(emotesetID)
-    result = False
-
     pack_name += "_by_" + bot.user.username
+    result = False
 
     if animated:
         emote_name = emoteurls[0]
