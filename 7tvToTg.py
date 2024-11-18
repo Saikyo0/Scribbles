@@ -40,7 +40,7 @@ def convert_webp_to_webm(input_path, output_path, height):
         shutil.rmtree("frames", ignore_errors=True)
         os.makedirs("frames", exist_ok=True)
 
-        # Extract frames from the WebP animation
+        # Extract frames from the WebP 
         with Image.open(input_path) as webp_image:
             frame_idx = 0
             for frame in ImageSequence.Iterator(webp_image):
@@ -49,10 +49,11 @@ def convert_webp_to_webm(input_path, output_path, height):
                 frame_resized.save(frame_path, "PNG")
                 frame_idx += 1
 
-        # Convert extracted frames to WebM using webptools
+        # Convert extracted frames to WebM using ffmpeg
         command = [
             'ffmpeg', '-y', '-framerate', '25', '-f', 'image2', '-i', 'frames/img_%03d.png',
             '-vf', f'scale=512:{height}', '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p',
+            '-b:v', '200K', '-minrate', '200K', '-maxrate', '200K', '-bufsize', '200K',
             '-t', '2.8', output_path
         ]
         subprocess.run(command)
